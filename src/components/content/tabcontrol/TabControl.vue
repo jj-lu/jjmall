@@ -27,7 +27,8 @@ export default {
   },
   methods : {
     tabClick(index) {
-      this.currentIndex = index
+      this.currentIndex = index;
+      this.$emit('toTabClick',index);
     }
   }
 }
@@ -41,11 +42,8 @@ export default {
   height: 40px;
   /*align-content: center;*/
   line-height: 40px;
+  z-index: 9;
   /*margin-top: 10px;*/
-}
-
-.tab-control-item{
-  border-bottom: 1px ;
 }
 
 .tab-control-item span{

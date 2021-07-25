@@ -1,6 +1,6 @@
 <template>
   <div class="goods">
-    <img :src="goodsListItem.show.img" alt="">
+    <img :src="goodsListItem.show.img" alt="" @load="imgLoad">
     <div class="goods-info">
       <p>{{goodsListItem.title}}</p>
       <span class="price">{{goodsListItem.price}}</span>
@@ -19,6 +19,11 @@ export default {
       default() {
         return {}
       }
+    }
+  },
+  methods: {
+    imgLoad(){
+      this.$bus.$emit('imgLoad');
     }
   }
 }
@@ -63,6 +68,7 @@ export default {
   background: url('~assets/img/common/collect.svg') 0 0/14px 14px;
   width: 14px;
   height: 14px;
+  z-index: 0;
 }
 
 
