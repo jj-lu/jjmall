@@ -35,7 +35,11 @@ export default {
       this.scroll.refresh();
     },
     scrollRefresh(){
+      console.log('执行refresh函数');
       this.scroll && this.scroll.refresh();
+    },
+    scrollY(){
+      return this.scroll.y;
     }
   },
   mounted() {

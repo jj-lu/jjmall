@@ -4,6 +4,10 @@
 <!--      <template v-slot:center><div>购物街</div></template>-->
       <div slot="center">购物街</div>
     </nav-bar>
+    <tab-control :tabs="['流行','新款','精选']"
+                 @toTabClick="tabClick"
+                 ref="tabControl2"
+                 v-show="isFixed"></tab-control>
 
     <scroll class="content"
             ref="scroll"
@@ -11,14 +15,17 @@
             :pull-up-load="true"
             @scroll="contextScroll"
             @pull="loadMore">
-      <home-swiper :banners="banners"></home-swiper>
+      <home-swiper :banners="banners"
+                   @swiperImageLoad="swiperLoad"></home-swiper>
       <RecommendView :recommends="recommends"></RecommendView>
       <feature-view></feature-view>
       <tab-control class="tab-control"
                    :tabs="['流行','新款','精选']"
-                   @toTabClick="tabClick"></tab-control>
+                   @toTabClick="tabClick"
+                   ref="tabControl1"></tab-control>
       <goods-list :goods="getGoods"></goods-list>
     </scroll>
+
 
     <back-top @click.native="backClick"
               v-show="isShowBackTop"></back-top>
@@ -54,7 +61,10 @@ export default {
       },
       currentType: 'pop',
       backTopImg: BaTopImg,
-      isShowBackTop: false
+      isShowBackTop: false,
+      offsetTop: 0,
+      isFixed: false,
+      saveY: 0
     }
   },
   components:{
@@ -70,7 +80,7 @@ export default {
   methods : {
     homeMultidata(){
       getHomeMultidata().then(res => {
-        console.log(res);
+        // console.log(res);
         // this.data = res;
         this.banners = res.data.banner.list;
         this.recommends = res.data.recommend.list;
@@ -94,6 +104,8 @@ export default {
     // 子传父，监听toTabControl事件
     tabClick(index){
       this.currentType = Object.keys(this.goods)[index];
+      this.$refs.tabControl1.currentIndex = index;
+      this.$refs.tabControl2.currentIndex = index;
       // console.log(this.currentType);
     },
 
@@ -106,13 +118,37 @@ export default {
     // 滚动显示BackTop按钮
     contextScroll(position){
       // console.log(position);
-      this.isShowBackTop = Math.abs(position.y) > 1000
+      this.isShowBackTop = Math.abs(position.y) > 1000;
+      this.isFixed = Math.abs(position.y) > this.offsetTop;
     },
 
+    // 下拉加载
     loadMore(){
       console.log('加载更多');
       this.homeGoods(this.currentType);
       this.$refs.scroll.finishpullup();
+    },
+
+    // 监听轮播图加载完成
+    swiperLoad(){
+      // console.log('swiperload');
+      console.log(this.$refs.tabControl1.$el.offsetTop);
+      this.offsetTop = this.$refs.tabControl1.$el.offsetTop;
+    },
+
+    // 防抖函数
+    debounce(func , delay){
+      // 初始化一次，所有的函数调用都会判断这里
+      let timer = null;
+      // console.log(timer + 'let');
+
+      return (...args) => {
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(() => {
+          // console.log('func.apply(this,args);');
+          func.apply(this,args);
+        },delay)
+      }
     }
   },
   computed: {
@@ -130,9 +166,20 @@ export default {
   },
   mounted() {
     // 监听item中图片加载完成
+    const refresh = this.debounce(this.$refs.scroll.scrollRefresh,500)
     this.$bus.$on('imgLoad',() => {
-      this.$refs.scroll.scrollRefresh();
+      refresh()
     })
+  },
+  activated() {
+    // console.log('activated');
+    this.$refs.scroll.scrollRefresh();
+    this.$refs.scroll.scrollUp(0,this.saveY,0);
+  },
+  deactivated() {
+    // console.log('deactivated');
+    // console.log(this.$refs.scroll.scrollY());
+    this.saveY = this.$refs.scroll.scrollY();
   }
 }
 </script>
@@ -142,17 +189,20 @@ export default {
 .home-nav{
   background-color: var(--color-tint);
   color: #ffffff;
-  position: sticky;
-  top: 0;
+
+  /*在使用浏览器原生滚动时，为了让导航不跟随一起滚动使用*/
+  /*position: sticky;*/
+  /*top: 0;*/
   /*left: 0;*/
   /*right: 0;*/
-  z-index: 9;
+  /*z-index: 9;*/
 }
 
 .tab-control{
-  position: sticky;
-  top: 44px;
+  /*position: sticky;*/
+  /*top: 44px;*/
   background-color: #ffffff;
+  position: relative;
 }
 
 /* 第一种确定内容高度的方式*/
@@ -178,6 +228,13 @@ export default {
   bottom: 49px;
   left: 0px;
   right: 0px;
-  /*overflow: hidden;*/
+  overflow: hidden;
+}
+
+.fix{
+  position: fixed;
+  top: 44px;
+  left: 0px;
+  right: 0px;
 }
 </style>

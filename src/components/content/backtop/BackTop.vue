@@ -1,6 +1,7 @@
 <template>
   <div class="back-top">
     <img :src="imgSrc" alt="">
+<!--    <img :src="require('@/assets/img/common/top.png')" alt="">-->
   </div>
 </template>
 
