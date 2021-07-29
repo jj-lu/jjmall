@@ -173,8 +173,9 @@ export default {
   },
   activated() {
     // console.log('activated');
-    this.$refs.scroll.scrollRefresh();
+
     this.$refs.scroll.scrollUp(0,this.saveY,0);
+    this.$refs.scroll.scrollRefresh();
   },
   deactivated() {
     // console.log('deactivated');

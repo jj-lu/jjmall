@@ -26,6 +26,6 @@ export default {
 @import "./assets/css/base.css";
 
 .main-tab-bar{
-  z-index: 9999;
+  z-index: 9;
 }
 </style>
