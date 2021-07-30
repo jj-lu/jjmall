@@ -46,6 +46,8 @@ import FeatureView from "./childComps/FeatureView";
 import BaTopImg from '../../assets/img/common/top.png';
 
 import {getHomeMultidata,getHomeGoods} from "../../network/home";
+import {debounce} from "../../common/utils";
+import {itemListener} from "../../common/mixin";
 
 export default {
   name: "Home",
@@ -136,26 +138,13 @@ export default {
       this.offsetTop = this.$refs.tabControl1.$el.offsetTop;
     },
 
-    // 防抖函数
-    debounce(func , delay){
-      // 初始化一次，所有的函数调用都会判断这里
-      let timer = null;
-      // console.log(timer + 'let');
-
-      return (...args) => {
-        if (timer) clearTimeout(timer);
-        timer = setTimeout(() => {
-          // console.log('func.apply(this,args);');
-          func.apply(this,args);
-        },delay)
-      }
-    }
   },
   computed: {
     getGoods(){
       return this.goods[this.currentType].list
     }
   },
+  mixins: [itemListener],
   created() {
     this.homeMultidata();
 
@@ -166,10 +155,11 @@ export default {
   },
   mounted() {
     // 监听item中图片加载完成
-    const refresh = this.debounce(this.$refs.scroll.scrollRefresh,500)
-    this.$bus.$on('imgLoad',() => {
-      refresh()
-    })
+    // const refresh = debounce(this.$refs.scroll.scrollRefresh,500)
+    // this.$bus.$on('imgLoad',() => {
+    //   refresh()
+    // })
+    // console.log('home-mounted');
   },
   activated() {
     // console.log('activated');
@@ -181,6 +171,7 @@ export default {
     // console.log('deactivated');
     // console.log(this.$refs.scroll.scrollY());
     this.saveY = this.$refs.scroll.scrollY();
+    this.$bus.$off('imgLoad',this.itemImgListener);
   }
 }
 </script>

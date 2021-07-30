@@ -13,6 +13,7 @@
       <detail-param-info2 :param-info="paramInfo">
 
       </detail-param-info2>
+      <goods-list :goods="recommends"></goods-list>
     </scroll>
   </div>
 </template>
@@ -28,8 +29,11 @@ import DetailGoodsInfo2 from "./childComps/DetailGoodsInfo2";
 import DetailParamInfo2 from "./childComps/DetailParamInfo2";
 
 import Scroll from "../../components/common/scroll/Scroll";
+import GoodsList from "../../components/content/goods/GoodsList";
 
-import {getDetail,Goods,Shop,GoodsParam} from 'network/detail';
+import {getDetail,getRecommends,Goods,Shop,GoodsParam} from 'network/detail';
+import {debounce,formatDate} from "../../common/utils";
+import {itemListener} from "../../common/mixin";
 
 export default {
   name: "Detail",
@@ -41,7 +45,8 @@ export default {
       shop: {},
       detailInfo: {},
       paramInfo: {},
-      imgDebounce : ()=>{}
+      imgDebounce : ()=>{},
+      recommends: []
     }
   },
   components: {
@@ -53,14 +58,14 @@ export default {
     DetailGoodsInfo2,
     DetailParamInfo2,
     Scroll,
-
+    GoodsList
   },
   methods: {
     getDetailData(){
       this.iid = this.$route.query.iid;
       getDetail(this.iid)
         .then(res => {
-          console.log(res);
+          // console.log(res);
           const data = res.result
           // console.log(res.result.itemInfo.topImages);
           this.topImages = data.itemInfo.topImages;
@@ -70,8 +75,15 @@ export default {
           this.paramInfo = new GoodsParam(data.itemParams.info,data.itemParams.rule,);
         })
     },
+    getRecommendsData(){
+      getRecommends()
+        .then(res=>{
+        console.log(res.data);
+        this.recommends = res.data.list;
+      })
+    },
     shopImgLoad(){
-      console.log('shopImgLoad');
+      // console.log('shopImgLoad');
       this.imgDebounce();
     },
     debounce(func,delay){
@@ -84,12 +96,11 @@ export default {
       }
     }
   },
+  mixins: [itemListener],
   created() {
     // console.log(this.$route.query.iid);
     this.getDetailData();
-  },
-  mounted() {
-    this.imgDebounce = this.debounce(this.$refs.scroll.scrollRefresh,500);
+    this.getRecommendsData();
   }
 }
 </script>
