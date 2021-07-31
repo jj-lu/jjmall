@@ -25,7 +25,7 @@
 import NavBar from "../../../components/common/navbar/NavBar";
 
 export default {
-  name: "DetailNarBar",
+  name: "DetailNavBar",
   data(){
     return {
       titles: ['商品','参数','评论','推荐'],
@@ -38,6 +38,7 @@ export default {
   methods: {
     itemClick(index){
       this.currentIndex = index;
+      this.$emit('narClick',index)
     },
     narBack(){
       this.$router.go(-1)

@@ -1,26 +1,37 @@
 <template>
   <div id="detail">
-    <detail-nar-bar class="nar-bar"></detail-nar-bar>
-    <scroll class="content" ref="scroll">
+
+    <detail-nav-bar class="nar-bar"
+                    @narClick="narBarClick"
+                    ref="nav">
+    </detail-nav-bar>
+
+    <scroll class="content"
+            ref="scroll"
+            :probe-type="3"
+            @scroll="scrollTo">
       <detail-swiper :top-images="topImages"></detail-swiper>
       <detail-base-info :goods="goods"></detail-base-info>
       <!--    <detail-shop-info :shop="shop"></detail-shop-info>-->
       <detail-shop-info2 :shop="shop"></detail-shop-info2>
       <detail-goods-info2 :detail-info="detailInfo"
                           @shopImgLoad="shopImgLoad">
-
       </detail-goods-info2>
-      <detail-param-info2 :param-info="paramInfo">
+      <detail-param-info2 :param-info="paramInfo"
+                          ref="param">
       </detail-param-info2>
-      <detail-comment-info :comment-info="commentInfo"/>
-      <goods-list :goods="recommends"></goods-list>
+      <detail-comment-info :comment-info="commentInfo"
+                           ref="comment"/>
+      <goods-list :goods="recommends"
+                  ref="recommend">
+      </goods-list>
     </scroll>
   </div>
 </template>
 
 <script>
 
-import DetailNarBar from "./childComps/DetailNarBar";
+import DetailNavBar from "./childComps/DetailNavBar";
 import DetailSwiper from "./childComps/DetailSwiper";
 import DetailBaseInfo from "./childComps/DetailBaseInfo";
 import DetailShopInfo from './childComps/DetailShopInfo';
@@ -33,8 +44,8 @@ import Scroll from "../../components/common/scroll/Scroll";
 import GoodsList from "../../components/content/goods/GoodsList";
 
 import {getDetail,getRecommends,Goods,Shop,GoodsParam} from 'network/detail';
-import {debounce,formatDate} from "../../common/utils";
 import {itemListener} from "../../common/mixin";
+import {debounce} from "../../common/utils";
 
 export default {
   name: "Detail",
@@ -47,12 +58,15 @@ export default {
       detailInfo: {},
       paramInfo: {},
       imgDebounce : ()=>{},
+      getOffsetY: ()=>{},
       recommends: [],
-      commentInfo: {}
+      commentInfo: {},
+      saveOffsetYs: [],
+      currentIndex: 0
     }
   },
   components: {
-    DetailNarBar,
+    DetailNavBar,
     DetailSwiper,
     DetailBaseInfo,
     DetailShopInfo,
@@ -79,6 +93,17 @@ export default {
           if (data.rate.cRate !== 0){
             this.commentInfo = data.rate.list[0]
           }
+
+          // this.$nextTick(()=>{
+          //   this.saveOffsetYs = []
+          //
+          //   this.saveOffsetYs.push(0)
+          //   this.saveOffsetYs.push(this.$refs.param.$el.offsetTop)
+          //   this.saveOffsetYs.push(this.$refs.comment.$el.offsetTop)
+          //   this.saveOffsetYs.push(this.$refs.recommend.$el.offsetTop)
+          //
+          //   console.log(this.saveOffsetYs);
+          // })
         })
     },
     getRecommendsData(){
@@ -91,14 +116,21 @@ export default {
     shopImgLoad(){
       // console.log('shopImgLoad');
       this.imgDebounce();
+      this.getOffsetY();
     },
-    debounce(func,delay){
-      let timer = null;
-      return (...args) => {
-        if (timer) clearTimeout(timer);
-        timer = setTimeout(()=>{
-          func.apply(this,args);
-        },delay)
+    narBarClick(index){
+      console.log(index);
+      this.$refs.scroll.scrollUp(0,-this.saveOffsetYs[index],500);
+    },
+    scrollTo(position){
+      // console.log(position.y);
+      let positionY = Math.abs(position.y);
+      for (let i = 0; i < this.saveOffsetYs.length - 1; i++) {
+        if (this.currentIndex != i && (positionY >= this.saveOffsetYs[i] && positionY < this.saveOffsetYs[i+1])){
+          this.currentIndex = i;
+          console.log(i);
+          this.$refs.nav.currentIndex = this.currentIndex;
+        }
       }
     }
   },
@@ -107,6 +139,44 @@ export default {
     // console.log(this.$route.query.iid);
     this.getDetailData();
     this.getRecommendsData();
+
+    // 获取各组件offset的防抖函数
+    this.getOffsetY = debounce(()=>{
+      this.saveOffsetYs = []
+
+      this.saveOffsetYs.push(0)
+      this.saveOffsetYs.push(this.$refs.param.$el.offsetTop)
+      this.saveOffsetYs.push(this.$refs.comment.$el.offsetTop)
+      this.saveOffsetYs.push(this.$refs.recommend.$el.offsetTop)
+      this.saveOffsetYs.push(Number.MAX_VALUE)
+
+      console.log(this.saveOffsetYs);
+    },300)
+
+  },
+  mounted() {
+    this.saveOffsetYs = []
+
+    // 图片加载刷新的防抖函数
+    this.imgDebounce = debounce(this.$refs.scroll.scrollRefresh,300);
+    // 0, undefined, undefined, 498
+    // 子组件的跟组件$el因为还没有传值进去，所以没开始渲染，还是为undefined
+    // this.saveOffsetYs.push(0)
+    // this.saveOffsetYs.push(this.$refs.param.$el.offsetTop)
+    // this.saveOffsetYs.push(this.$refs.comment.$el.offsetTop)
+    // this.saveOffsetYs.push(this.$refs.recommend.$el.offsetTop)
+    //
+    // console.log(this.saveOffsetYs);
+  },
+  updated() {
+    // this.saveOffsetYs = []
+    //
+    // this.saveOffsetYs.push(0)
+    // this.saveOffsetYs.push(this.$refs.param.$el.offsetTop)
+    // this.saveOffsetYs.push(this.$refs.comment.$el.offsetTop)
+    // this.saveOffsetYs.push(this.$refs.recommend.$el.offsetTop)
+    //
+    // console.log(this.saveOffsetYs);
   }
 }
 </script>

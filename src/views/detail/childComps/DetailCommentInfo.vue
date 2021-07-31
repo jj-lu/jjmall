@@ -41,7 +41,7 @@ export default {
   computed:{
     dateChange(){
       const date = new Date(this.commentInfo.created * 1000);
-      console.log(date);
+      // console.log(date);
       return formatDate(date,'yyyy-MM-dd')
     }
   }

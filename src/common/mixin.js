@@ -12,7 +12,7 @@ export const itemListener = {
       refresh()
     }
     this.$bus.$on('imgLoad',this.itemImgListener)
-    console.log('mixin函数');
-    console.log(this);
+    // console.log('mixin函数');
+    // console.log(this);
   }
 }
