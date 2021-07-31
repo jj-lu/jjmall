@@ -11,8 +11,8 @@
 
       </detail-goods-info2>
       <detail-param-info2 :param-info="paramInfo">
-
       </detail-param-info2>
+      <detail-comment-info :comment-info="commentInfo"/>
       <goods-list :goods="recommends"></goods-list>
     </scroll>
   </div>
@@ -27,6 +27,7 @@ import DetailShopInfo from './childComps/DetailShopInfo';
 import DetailShopInfo2 from "./childComps/DetailShopInfo2";
 import DetailGoodsInfo2 from "./childComps/DetailGoodsInfo2";
 import DetailParamInfo2 from "./childComps/DetailParamInfo2";
+import DetailCommentInfo from "./childComps/DetailCommentInfo";
 
 import Scroll from "../../components/common/scroll/Scroll";
 import GoodsList from "../../components/content/goods/GoodsList";
@@ -46,7 +47,8 @@ export default {
       detailInfo: {},
       paramInfo: {},
       imgDebounce : ()=>{},
-      recommends: []
+      recommends: [],
+      commentInfo: {}
     }
   },
   components: {
@@ -57,6 +59,7 @@ export default {
     DetailShopInfo2,
     DetailGoodsInfo2,
     DetailParamInfo2,
+    DetailCommentInfo,
     Scroll,
     GoodsList
   },
@@ -73,6 +76,9 @@ export default {
           this.shop = new Shop(data.shopInfo);
           this.detailInfo = data.detailInfo;
           this.paramInfo = new GoodsParam(data.itemParams.info,data.itemParams.rule,);
+          if (data.rate.cRate !== 0){
+            this.commentInfo = data.rate.list[0]
+          }
         })
     },
     getRecommendsData(){
