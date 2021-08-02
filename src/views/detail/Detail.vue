@@ -26,6 +26,11 @@
                   ref="recommend">
       </goods-list>
     </scroll>
+
+    <detail-bottom-bar @addCart="addToCart"/>
+
+    <back-top @click.native="backClick"
+              v-show="isShowBackTop"></back-top>
   </div>
 </template>
 
@@ -39,12 +44,13 @@ import DetailShopInfo2 from "./childComps/DetailShopInfo2";
 import DetailGoodsInfo2 from "./childComps/DetailGoodsInfo2";
 import DetailParamInfo2 from "./childComps/DetailParamInfo2";
 import DetailCommentInfo from "./childComps/DetailCommentInfo";
+import DetailBottomBar from "./childComps/DetailBottomBar";
 
 import Scroll from "../../components/common/scroll/Scroll";
 import GoodsList from "../../components/content/goods/GoodsList";
 
 import {getDetail,getRecommends,Goods,Shop,GoodsParam} from 'network/detail';
-import {itemListener} from "../../common/mixin";
+import {itemListener,backTopMixin} from "../../common/mixin";
 import {debounce} from "../../common/utils";
 
 export default {
@@ -74,6 +80,7 @@ export default {
     DetailGoodsInfo2,
     DetailParamInfo2,
     DetailCommentInfo,
+    DetailBottomBar,
     Scroll,
     GoodsList
   },
@@ -119,7 +126,7 @@ export default {
       this.getOffsetY();
     },
     narBarClick(index){
-      console.log(index);
+      // console.log(index);
       this.$refs.scroll.scrollUp(0,-this.saveOffsetYs[index],500);
     },
     scrollTo(position){
@@ -128,13 +135,24 @@ export default {
       for (let i = 0; i < this.saveOffsetYs.length - 1; i++) {
         if (this.currentIndex != i && (positionY >= this.saveOffsetYs[i] && positionY < this.saveOffsetYs[i+1])){
           this.currentIndex = i;
-          console.log(i);
+          // console.log(i);
           this.$refs.nav.currentIndex = this.currentIndex;
         }
       }
+      this.isShowBackTop = positionY > 1000;
+    },
+    addToCart(){
+      let product = {};
+      product.image = this.topImages[0];
+      product.title = this.goods.title;
+      product.iid = this.iid;
+      product.desc = this.goods.desc;
+      product.price = this.goods.realPrice;
+
+      this.$store.dispatch('addCart',product);
     }
   },
-  mixins: [itemListener],
+  mixins: [itemListener,backTopMixin],
   created() {
     // console.log(this.$route.query.iid);
     this.getDetailData();
@@ -150,7 +168,7 @@ export default {
       this.saveOffsetYs.push(this.$refs.recommend.$el.offsetTop)
       this.saveOffsetYs.push(Number.MAX_VALUE)
 
-      console.log(this.saveOffsetYs);
+      // console.log(this.saveOffsetYs);
     },300)
 
   },
@@ -196,6 +214,6 @@ export default {
   }
 
   .content{
-    height: calc(100% - 44px);
+    height: calc(100% - 94px);
   }
 </style>

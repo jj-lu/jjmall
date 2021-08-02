@@ -46,8 +46,7 @@ import FeatureView from "./childComps/FeatureView";
 import BaTopImg from '../../assets/img/common/top.png';
 
 import {getHomeMultidata,getHomeGoods} from "../../network/home";
-import {debounce} from "../../common/utils";
-import {itemListener} from "../../common/mixin";
+import {itemListener,backTopMixin} from "../../common/mixin";
 
 export default {
   name: "Home",
@@ -74,7 +73,6 @@ export default {
     Scroll,
     TabControl,
     GoodsList,
-    BackTop,
     HomeSwiper,
     RecommendView,
     FeatureView
@@ -111,11 +109,11 @@ export default {
       // console.log(this.currentType);
     },
 
-    // 回到首页顶部
-    backClick(){
-      console.log('click');
-      this.$refs.scroll.scrollUp(0,0);
-    },
+    // 回到首页顶部(混入)
+    // backClick(){
+    //   console.log('click');
+    //   this.$refs.scroll.scrollUp(0,0,300);
+    // },
 
     // 滚动显示BackTop按钮
     contextScroll(position){
@@ -144,7 +142,7 @@ export default {
       return this.goods[this.currentType].list
     }
   },
-  mixins: [itemListener],
+  mixins: [itemListener,backTopMixin ],
   created() {
     this.homeMultidata();
 
