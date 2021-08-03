@@ -1,5 +1,5 @@
 <template>
-  <div class="cartlist">
+  <div class="cart-list">
     <Scroll class="content" ref="scroll">
       <cart-list-item v-for="(item,index) in cartList"
                       :key="index"
@@ -31,12 +31,20 @@ export default {
 </script>
 
 <style scoped>
-.cartlist{
-  height: 100vh;
+.cart-list{
+  height: calc(100vh - 133px);
+  /*position: relative;*/
+  /*height: 100vh;*/
 }
 
 .content{
-  height: calc(100% - 94px);
+  /*position: absolute;*/
+  /*bottom: 49px;*/
+  /*top: 0px;*/
+  /*left: 0;*/
+  /*right: 0;*/
+  height: 100%;
   overflow: hidden;
+  /*background-color: #666666;*/
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <img class="check-box" :class="{active : isActive}" src="~assets/img/cart/tick.svg" alt="">
+    <img class="check-box" :class="{active : isCheck}" src="~assets/img/cart/tick.svg" alt="">
   </div>
 </template>
 
@@ -8,9 +8,9 @@
 export default {
   name: "CheckBox",
   props: {
-    isActive: {
+    isCheck: {
       type: Boolean,
-      default: true
+      default: false
     }
   }
 }

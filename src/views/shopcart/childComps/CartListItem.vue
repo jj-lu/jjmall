@@ -1,7 +1,7 @@
 <template>
   <div class="list-item clear-fix" v-if="Object.keys(item).length !== 0">
     <div class="item-left">
-      <CheckBox/>
+      <CheckBox :is-check="item.isCheck" @click.native="checkClick"/>
     </div>
     <img class="item-img" :src="item.image" alt="">
     <div class="item-right">
@@ -30,6 +30,12 @@ export default {
   },
   components: {
     CheckBox
+  },
+  methods: {
+    checkClick(){
+      this.item.isCheck = !this.item.isCheck;
+      console.log(this.$store.state.cartList)
+    }
   }
 }
 </script>
