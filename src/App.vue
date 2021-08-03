@@ -10,9 +10,6 @@
 <script>
 
 import MainTabBar from "./components/content/maintabbar/MainTabBar";
-import Vue from 'vue'
-
-Vue.prototype.$bus = new Vue();
 
 export default {
   name: 'App',
